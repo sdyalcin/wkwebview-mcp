@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bug Playground</title>
+  <style>
+    :root {
+      --bg: #f6f6f3;
+      --card: #ffffff;
+      --text: #1d1d1b;
+      --muted: #6b6b66;
+      --accent: #2f6fde;
+      --ok: #1f8a4c;
+      --bad: #c2362f;
+      --border: #e3e3dc;
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141413;
+        --card: #1f1f1d;
+        --text: #f1f1ec;
+        --muted: #a3a39c;
+        --accent: #6f9cf0;
+        --ok: #4cc27f;
+        --bad: #ef6b63;
+        --border: #34342f;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: env(safe-area-inset-top) 16px 32px;
+      font: 16px/1.45 -apple-system, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    h1 { font-size: 26px; margin: 20px 0 4px; }
+    h2 { font-size: 17px; margin: 0 0 8px; }
+    p { margin: 0 0 12px; color: var(--muted); }
+    nav { display: flex; gap: 8px; margin: 16px 0; }
+    nav a {
+      flex: 1; text-align: center; padding: 8px; border-radius: 10px;
+      background: var(--card); border: 1px solid var(--border); color: var(--text); text-decoration: none;
+    }
+    nav a[aria-current="page"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    section {
+      position: relative;
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px; margin-bottom: 14px;
+    }
+    button, select, input {
+      font: inherit; border-radius: 10px; border: 1px solid var(--border);
+      padding: 9px 12px; background: var(--bg); color: var(--text);
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .status { margin-top: 10px; font-size: 14px; min-height: 20px; }
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+    ul.tips { margin: 0; padding-left: 20px; color: var(--muted); }
+    ul.tips li { margin-bottom: 6px; }
+    iframe { width: 100%; height: 120px; border: 1px dashed var(--border); border-radius: 10px; }
+    /* Left over from a cookie banner that animates out: invisible, but still on top. */
+    .banner-ghost { position: absolute; inset: 0; opacity: 0; border-radius: 14px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <h1>Bug Playground</h1>
+  <p>Each card hides a bug a coding agent can track down with wkwebview-mcp.</p>
+
+  <nav>
+    <a href="#/home" data-route="home">Home</a>
+    <a href="#/settings" data-route="settings">Settings</a>
+  </nav>
+
+  <main id="home">
+    <section id="profile-card">
+      <h2>1. Profile</h2>
+      <p>"Load profile" should show the user's name.</p>
+      <button class="primary" id="load-profile">Load profile</button>
+      <div class="status" id="profile-status"></div>
+    </section>
+
+    <section id="newsletter-card">
+      <h2>2. Newsletter</h2>
+      <p>Tapping "Subscribe" does nothing.</p>
+      <div class="row">
+        <input id="email" type="email" placeholder="you@example.com" autocomplete="off">
+        <button class="primary" id="subscribe">Subscribe</button>
+      </div>
+      <div class="status" id="newsletter-status"></div>
+      <div class="banner-ghost" id="cookie-banner"></div>
+    </section>
+
+    <section id="sync-card">
+      <h2>3. Sync</h2>
+      <p>"Sync now" spins forever.</p>
+      <button id="sync">Sync now</button>
+      <div class="status" id="sync-status"></div>
+    </section>
+
+    <section id="widget-card">
+      <h2>4. Payment widget (iframe)</h2>
+      <p>The widget runs in its own frame and reports back to the page.</p>
+      <iframe id="widget" title="Payment widget" srcdoc="
+        <style>body{font:15px -apple-system,sans-serif;margin:12px;color:#888}button{font:inherit;padding:8px 12px;border-radius:8px}</style>
+        <p>Widget v2.1 loaded</p>
+        <button id='pay' onclick='pay()'>Pay 9.99</button>
+        <script>
+          console.info('[widget] ready');
+          function pay() {
+            console.log('[widget] pay tapped');
+            parent.postMessage({ type: 'payment', status: 'declined', reason: 'card_expired' }, '*');
+          }
+        </script>"></iframe>
+      <div class="status" id="widget-status"></div>
+    </section>
+  </main>
+
+  <main id="settings" hidden>
+    <section>
+      <h2>Settings</h2>
+      <p>Saving posts to a test API.</p>
+      <div class="row">
+        <select id="theme">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+        <label><input type="checkbox" id="notifications"> Notifications</label>
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <button class="primary" id="save">Save</button>
+      </div>
+      <div class="status" id="settings-status"></div>
+    </section>
+  </main>
+
+  <section>
+    <h2>Try asking your agent</h2>
+    <ul class="tips">
+      <li>Why does "Load profile" fail? Fix it.</li>
+      <li>Why does tapping "Subscribe" do nothing?</li>
+      <li>Why does "Sync now" never finish?</li>
+      <li>Pay in the widget and tell me why it was declined.</li>
+      <li>Change the theme to Dark in Settings, save, and show me the request body.</li>
+    </ul>
+  </section>
+
+  <script>
+    const API = 'https://jsonplaceholder.typicode.com';
+    const $ = (id) => document.getElementById(id);
+    function status(id, text, kind) {
+      const el = $(id);
+      el.textContent = text;
+      el.className = 'status ' + (kind || '');
+    }
+
+    // Routing ------------------------------------------------------------------------------
+    function route() {
+      const name = (location.hash.match(/^#\/(\w+)/) || [])[1] || 'home';
+      document.querySelectorAll('main').forEach((main) => { main.hidden = main.id !== name; });
+      document.querySelectorAll('nav a').forEach((link) => {
+        if (link.dataset.route === name) {
+          link.setAttribute('aria-current', 'page');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+      console.debug('[router] showing', name);
+    }
+    document.querySelectorAll('nav a').forEach((link) => link.addEventListener('click', (event) => {
+      event.preventDefault();
+      history.pushState({}, '', link.getAttribute('href'));
+      route();
+    }));
+    window.addEventListener('popstate', route);
+    route();
+
+    // 1. Profile: wrong endpoint, then an unguarded property read -------------------------
+    $('load-profile').addEventListener('click', async () => {
+      status('profile-status', 'Loading…');
+      try {
+        const response = await fetch(`${API}/user/1`);
+        const user = await response.json();
+        status('profile-status', 'Hello, ' + user.name.toUpperCase(), 'ok');
+      } catch (error) {
+        console.error('Profile failed', error);
+        status('profile-status', 'Something went wrong.', 'bad');
+      }
+    });
+
+    // 2. Newsletter: works, if a tap ever reaches it -----------------------------------------
+    $('subscribe').addEventListener('click', () => {
+      const email = $('email').value.trim();
+      if (!email.includes('@')) {
+        status('newsletter-status', 'Enter a valid email.', 'bad');
+        return;
+      }
+      console.log('[newsletter] subscribed', email);
+      status('newsletter-status', 'Subscribed ' + email, 'ok');
+    });
+
+    // 3. Sync: the rejection is never handled, so the spinner never stops ------------------
+    $('sync').addEventListener('click', () => {
+      status('sync-status', 'Syncing…');
+      fetch(`${API}/todos?userId=1`)
+        .then((response) => response.json())
+        .then((todos) => {
+          console.log('[sync] got', todos.length, 'todos');
+          return Promise.reject(new Error('Conflict on todo ' + todos[0].id + ': local copy is newer'));
+        })
+        .then(() => status('sync-status', 'Synced', 'ok'));
+    });
+
+    // 4. Widget -----------------------------------------------------------------------------
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'payment') {
+        console.warn('[payment]', event.data.status);
+        status('widget-status', 'Payment ' + event.data.status, event.data.status === 'approved' ? 'ok' : 'bad');
+      }
+    });
+
+    // Settings: XHR, so both request kinds show up -----------------------------------------
+    $('save').addEventListener('click', () => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API}/posts`);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onload = () => status('settings-status', xhr.status === 201 ? 'Saved' : 'Save failed: ' + xhr.status, xhr.status === 201 ? 'ok' : 'bad');
+      xhr.onerror = () => status('settings-status', 'Network error', 'bad');
+      xhr.send(JSON.stringify({ theme: $('theme').value, notifications: $('notifications').checked }));
+    });
+
+    console.log('[playground] ready');
+  </script>
+</body>
+</html>

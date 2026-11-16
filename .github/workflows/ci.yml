@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  swift:
+    name: Swift package
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test on macOS (real WKWebView)
+        run: swift test
+      - name: Build for iOS Simulator
+        run: xcodebuild -scheme WebViewMCP -destination 'generic/platform=iOS Simulator' build | tail -5
+      - name: Build the example app
+        run: xcodebuild -project Example/WebViewMCPExample.xcodeproj -scheme WebViewMCPExample -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build | tail -5
+
+  mcp:
+    name: MCP server
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test

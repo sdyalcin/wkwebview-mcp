@@ -1,0 +1,43 @@
+{
+  "name": "wkwebview-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for debugging WKWebViews inside iOS apps: console, network, DOM, JavaScript and screenshots for Claude Code, Cursor and other MCP clients. Works with native, Capacitor, Cordova, React Native and Flutter apps.",
+  "type": "module",
+  "bin": {
+    "wkwebview-mcp": "mcp/server.mjs"
+  },
+  "files": [
+    "mcp/server.mjs"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "test": "node --test mcp/test/"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "wkwebview",
+    "webview",
+    "ios",
+    "swift",
+    "hybrid",
+    "capacitor",
+    "cordova",
+    "react-native-webview",
+    "flutter",
+    "debugger",
+    "web-inspector",
+    "simulator",
+    "claude",
+    "cursor"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sdyalcin/wkwebview-mcp.git"
+  },
+  "mcpName": "io.github.sdyalcin/wkwebview-mcp"
+}

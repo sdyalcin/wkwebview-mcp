@@ -1,0 +1,29 @@
+name: WebViewMCPExample
+options:
+  bundleIdPrefix: dev.wkwebviewmcp
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+packages:
+  WebViewMCP:
+    path: ..
+targets:
+  WebViewMCPExample:
+    type: application
+    platform: iOS
+    sources:
+      - WebViewMCPExample
+    dependencies:
+      - package: WebViewMCP
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.wkwebviewmcp.example
+        INFOPLIST_KEY_CFBundleDisplayName: WebView MCP
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        GENERATE_INFOPLIST_FILE: YES
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: "1,2"
